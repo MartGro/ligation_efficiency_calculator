@@ -119,13 +119,18 @@
 
 
 <body>
-    <h1>4-mer Ligation Efficiency Lookup</h1>
+    <h1>4-mer Ligation Efficiency Lookup for 1h T4 ligation at 37°C</h1>
+    Based on "Comprehensive Profiling of Four Base Overhang Ligation Fidelity by T4 DNA Ligase and Application to DNA Assembly",  
     <form onsubmit="lookupEfficiency()">
         <input type="text" id="sequence-input" maxlength="4" placeholder="Enter 4-mer (e.g., ACCT)" required>
         <input type="submit" value="Lookup">
     </form>
     <p id="correct-result"></p>
     <p id="incorrect-result"></p>
+    
+        <p>
+        This tool is based on the data presented in Supplementary Table 2 of the paper "Comprehensive Profiling of Four Base Overhang Ligation Fidelity by T4 DNA Ligase and Application to DNA Assembly" by Vladimir Potapov, Jennifer L. Ong, Rebecca B. Kucera, Bradley W. Langhorst, Katharina Bilotti, John M. Pryor, Eric J. Cantor, Barry Canton, Thomas F. Knight, Thomas C. Evans Jr., and Gregory J. S. Lohman. This study provides an in-depth analysis of the ligation efficiency of four base overhangs by T4 DNA Ligase, offering valuable insights for DNA assembly and molecular cloning applications. For more details, please refer to the <a href="https://pubs.acs.org/doi/abs/10.1021/acssynbio.8b00333" target="_blank">original publication.</a>.
+    </p>
 </body>
 </html>
 
