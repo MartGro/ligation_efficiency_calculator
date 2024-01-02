@@ -15,6 +15,8 @@
         }
     </style>
     <script>
+        let sortedEfficiencies = [];
+
         async function lookupEfficiency() {
             event.preventDefault();
             const sequence = document.getElementById('sequence-input').value.toUpperCase();
@@ -61,20 +63,61 @@
         }
 
         function calculatePercentileRank(efficiency) {
-            // Dummy function for now, replace with actual percentile rank calculation
-            // For demonstration, returns a random percentile rank
-            return Math.random() * 100;
+            let count = 0;
+            sortedEfficiencies.forEach(function(value) {
+                if (value <= efficiency) {
+                    count++;
+                }
+            });
+            const total = sortedEfficiencies.length;
+            const percentileRank = (100 * count) / total;
+            return percentileRank;
         }
 
         function assignColorClass(efficiency, isCorrect) {
-            // Existing code for assigning color class
+            if (isCorrect) {
+                if (efficiency > 70) return 'good';
+                if (efficiency > 30) return 'average';
+                return 'poor';
+            } else {
+                if (efficiency > 70) return 'poor';
+                if (efficiency > 30) return 'average';
+                return 'good';
+            }
         }
 
         function assignTitle(efficiency, isCorrect) {
-            // Existing code for assigning titles
+            if (isCorrect) {
+                if (efficiency > 70) return 'High correct ligation efficiency';
+                if (efficiency > 30) return 'Medium correct ligation efficiency';
+                return 'Low correct ligation efficiency';
+            } else {
+                if (efficiency > 70) return 'High relative off-target efficiency (poor)';
+                if (efficiency > 30) return 'Medium relative off-target efficiency';
+                return 'Low relative off-target efficiency (good)';
+            }
         }
+        // Function to sort efficiencies
+        async function sortEfficiencies() {
+            const response = await fetch('ligation_efficiency_T4_37C_1h_correct_and_incorrect.csv');
+            const csvText = await response.text();
+            const rows = csvText.split('\n');
+            let efficiencies = [];
+
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].split(',');
+                efficiencies.push(parseFloat(cells[1]));
+            }
+
+            sortedEfficiencies = efficiencies.sort((a, b) => a - b);
+        }
+
+        // Call this function when the page loads to sort the efficiencies
+        window.onload = sortEfficiencies;
     </script>
 </head>
+
+
 <body>
     <h1>4-mer Ligation Efficiency Lookup</h1>
     <form onsubmit="lookupEfficiency()">
@@ -85,5 +128,4 @@
     <p id="incorrect-result"></p>
 </body>
 </html>
-
 
