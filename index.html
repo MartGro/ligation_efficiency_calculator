@@ -20,7 +20,7 @@
         async function lookupEfficiency() {
             event.preventDefault();
             const sequence = document.getElementById('sequence-input').value.toUpperCase();
-            const response = await fetch('all_ligation_efficiency.csv');
+            const response = await fetch('ligation_efficiency_T4_37C_1h_correct_and_incorrect.csv');
             const csvText = await response.text();
             const rows = csvText.split('\n');
             let correctEfficiency = 'Not found';
