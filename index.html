@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>4-mer Ligation Efficiency Lookup</title>
+    <script>
+        // This function will be called when the user submits the form
+        async function lookupEfficiency() {
+            // Prevent the form from submitting traditionally
+            event.preventDefault();
+
+            // Get the 4-mer sequence from the input
+            const sequence = document.getElementById('sequence-input').value.toUpperCase();
+
+            // Fetch the CSV file from the repository
+            const response = await fetch('ligation_efficiency_T4_37C_1h_correct_and_incorrect.csv');
+            const csvText = await response.text();
+
+            // Parse the CSV text
+            const rows = csvText.split('\n');
+            let correctEfficiency = 'Not found';
+            let incorrectEfficiency = 'Not found';
+
+            // Skip the header and search for the sequence in the CSV data
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].split(',');
+                if (cells[0] === sequence) {
+                    correctEfficiency = cells[1];
+                    incorrectEfficiency = cells[2];
+                    break;
+                }
+            }
+
+            // Display the result
+            document.getElementById('correct-result').textContent = `Correct Ligation Efficiency for ${sequence}: ${correctEfficiency}`;
+            document.getElementById('incorrect-result').textContent = `Incorrect Ligation Efficiency for ${sequence}: ${incorrectEfficiency}`;
+        }
+    </script>
+</head>
+<body>
+    <h1>4-mer Ligation Efficiency Lookup</h1>
+    <form onsubmit="lookupEfficiency()">
+        <input type="text" id="sequence-input" maxlength="4" placeholder="Enter 4-mer (e.g., ACCT)" required>
+        <input type="submit" value="Lookup">
+    </form>
+    <p id="correct-result"></p>
+    <p id="incorrect-result"></p>
+</body>
+</html>
+
