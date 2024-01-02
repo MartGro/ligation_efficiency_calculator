@@ -15,8 +15,6 @@
         }
     </style>
     <script>
-        const correctEfficiencyThresholds = { low: 1673, high: 3367 };
-
         async function lookupEfficiency() {
             event.preventDefault();
             const sequence = document.getElementById('sequence-input').value.toUpperCase();
@@ -50,15 +48,40 @@
         function createEfficiencyElement(efficiency, type) {
             const efficiencyValue = isNaN(efficiency) ? efficiency : parseFloat(efficiency);
             const span = document.createElement('span');
-            span.textContent = efficiencyValue + (type === 'correct' ? ' (Top ' + (100 - efficiencyValue).toFixed(2) + '%)' : '');
-
             if (type === 'correct') {
-                // ... (existing code for correct efficiency styling and tooltips)
-            } else if (type === 'incorrect') {
-                // ... (existing code for incorrect efficiency styling and tooltips)
+                span.textContent = efficiencyValue + ' (' + (100 - efficiencyValue).toFixed(2) + '% top)';
+                span.className = assignColorClass(efficiencyValue, true);
+                span.title = assignTitle(efficiencyValue, true);
+            } else {
+                span.textContent = efficiencyValue + '%';
+                span.className = assignColorClass(efficiencyValue, false);
+                span.title = assignTitle(efficiencyValue, false);
             }
-
             return span;
+        }
+
+        function assignColorClass(efficiency, isCorrect) {
+            if (isCorrect) {
+                if (efficiency > 70) return 'good';
+                if (efficiency > 30) return 'average';
+                return 'poor';
+            } else {
+                if (efficiency > 70) return 'poor';
+                if (efficiency > 30) return 'average';
+                return 'good';
+            }
+        }
+
+        function assignTitle(efficiency, isCorrect) {
+            if (isCorrect) {
+                if (efficiency > 70) return 'High correct ligation efficiency';
+                if (efficiency > 30) return 'Medium correct ligation efficiency';
+                return 'Low correct ligation efficiency';
+            } else {
+                if (efficiency > 70) return 'High relative off-target efficiency (poor)';
+                if (efficiency > 30) return 'Medium relative off-target efficiency';
+                return 'Low relative off-target efficiency (good)';
+            }
         }
     </script>
 </head>
