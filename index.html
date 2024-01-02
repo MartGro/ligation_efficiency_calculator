@@ -3,37 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <title>4-mer Ligation Efficiency Lookup</title>
+    <style>
+        .good {
+            color: green;
+        }
+        .average {
+            color: goldenrod;
+        }
+        .poor {
+            color: red;
+        }
+    </style>
     <script>
-        // This function will be called when the user submits the form
+        const correctEfficiencyThresholds = { low: 1673, high: 3367 };
+
         async function lookupEfficiency() {
-            // Prevent the form from submitting traditionally
             event.preventDefault();
-
-            // Get the 4-mer sequence from the input
             const sequence = document.getElementById('sequence-input').value.toUpperCase();
-
-            // Fetch the CSV file from the repository
-            const response = await fetch('ligation_efficiency_T4_37C_1h_correct_and_incorrect.csv');
+            const response = await fetch('all_ligation_efficiency.csv');
             const csvText = await response.text();
-
-            // Parse the CSV text
             const rows = csvText.split('\n');
             let correctEfficiency = 'Not found';
             let incorrectEfficiency = 'Not found';
 
-            // Skip the header and search for the sequence in the CSV data
             for (let i = 1; i < rows.length; i++) {
                 const cells = rows[i].split(',');
                 if (cells[0] === sequence) {
-                    correctEfficiency = cells[1];
-                    incorrectEfficiency = cells[2];
+                    correctEfficiency = parseFloat(cells[1]);
+                    incorrectEfficiency = parseFloat(cells[2]);
                     break;
                 }
             }
 
-            // Display the result
-            document.getElementById('correct-result').textContent = `Correct Ligation Efficiency for ${sequence}: ${correctEfficiency}`;
-            document.getElementById('incorrect-result').textContent = `Incorrect Ligation Efficiency for ${sequence}: ${incorrectEfficiency}`;
+            document.getElementById('correct-result').textContent = `Correct Ligation Efficiency for ${sequence}: `;
+            document.getElementById('correct-result').appendChild(createEfficiencyElement(correctEfficiency, 'correct'));
+
+            // Calculate the relative off-target efficiency
+            let relativeIncorrectEfficiency = 'Not found';
+            if (correctEfficiency !== 'Not found' && incorrectEfficiency !== 'Not found') {
+                relativeIncorrectEfficiency = (incorrectEfficiency / correctEfficiency * 100).toFixed(2);
+            }
+
+            document.getElementById('incorrect-result').textContent = `Relative Off-Target Efficiency for ${sequence}: `;
+            document.getElementById('incorrect-result').appendChild(createEfficiencyElement(relativeIncorrectEfficiency, 'incorrect'));
+        }
+
+        function createEfficiencyElement(efficiency, type) {
+            const efficiencyValue = isNaN(efficiency) ? efficiency : parseFloat(efficiency);
+            const span = document.createElement('span');
+            span.textContent = efficiencyValue;
+
+            if (type === 'correct') {
+                if (efficiencyValue === 'Not found') {
+                    span.className = 'poor';
+                    span.title = 'This sequence does not have an efficiency rating.';
+                } else if (efficiencyValue > correctEfficiencyThresholds.high) {
+                    span.className = 'good';
+                    span.title = 'This is a high correct ligation efficiency.';
+                } else if (efficiencyValue > correctEfficiencyThresholds.low) {
+                    span.className = 'average';
+                    span.title = 'This is an average correct ligation efficiency.';
+                } else {
+                    span.className = 'poor';
+                    span.title = 'This is a low correct ligation efficiency.';
+                }
+            } else if (type === 'incorrect') {
+                if (efficiencyValue === 'Not found') {
+                    span.className = '';
+                    span.title = 'Off-target efficiency is not applicable.';
+                } else if (efficiencyValue > 70) {
+                    span.className = 'poor';
+                    span.title = 'This is a poor off-target efficiency, indicating a high level of incorrect ligation.';
+                } else if (efficiencyValue > 30) {
+                    span.className = 'average';
+                    span.title = 'This is an average off-target efficiency.';
+                } else {
+                    span.className = 'good';
+                    span.title = 'This is a good off-target efficiency, indicating a low level of incorrect ligation.';
+                }
+            }
+
+            return span;
         }
     </script>
 </head>
